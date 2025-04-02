@@ -1,70 +1,13 @@
-import jwt from 'jsonwebtoken';
 import Cookies from 'js-cookie';
+import jwt from 'jsonwebtoken';
 
-export const getUserData = async () => {
-  const token = Cookies.get('token'); // Get the token from cookies
-  if (!token) {
-    console.error('No authentication token found');
-    throw new Error('No authentication token found');
-  }
-
-  try {
-    const response = await fetch('/api/user', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`, // Attach token in header
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch user data');
-    }
-
-    return await response.json(); // Should return { firstName, phone, dob, userType }
-  } catch (error) {
-    console.error('User data fetch error:', error.message);
-    clearAuthToken(); // Remove token if invalid
-    throw error;
-  }
-};
-
-  
-  // ✅ Logout User
-  export const logoutUser = () => {
-    clearAuthToken();
-    window.location.href = '/'; // Redirect to home after logout
-  };
-  
-// ✅ Authenticate User and Return Token & Role
-export const authenticateUser = async (phone, password) => {
-  try {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone, password }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Authentication failed');
-    }
-
-    const data = await response.json();
-    return data; // { token, userType }
-  } catch (error) {
-    console.error('Authentication error:', error.message);
-    throw error;
-  }
-};
-
-// ✅ Register User
+// Register new user
 export const registerUser = async (userData) => {
   try {
     const response = await fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData),
+      body: JSON.stringify(userData)
     });
 
     if (!response.ok) {
@@ -74,61 +17,81 @@ export const registerUser = async (userData) => {
 
     const data = await response.json();
     return data;
+
   } catch (error) {
-    console.error('Registration error:', error.message);
+    console.error('Registration error:', error);
     throw error;
   }
 };
 
-// ✅ Store Token in Cookies
-export const storeAuthToken = (token, rememberMe = false) => {
-  const options = { path: '/', sameSite: 'Lax' };
-  if (rememberMe) options.expires = 7; // Persist for 7 days if rememberMe is checked
-
+// Store authentication token
+export const storeAuthToken = (token, remember = false) => {
+  const options = {
+    path: '/',
+    sameSite: 'Lax',
+    secure: process.env.NODE_ENV === 'production',
+    ...(remember && { expires: 7 }) // 7 days if "remember me"
+  };
   Cookies.set('token', token, options);
 };
 
-// ✅ Remove Token from Cookies
+// Remove authentication token
 export const clearAuthToken = () => {
   Cookies.remove('token', { path: '/' });
 };
 
-// ✅ Redirect Based on User Role
-export const redirectByRole = (router, userType) => {
-    const routes = {
-      super_admin: '/super_admin',
-      station: '/station',
-      user: '/user', // Make sure this exists in Next.js pages
-    };
-  
-    router.push(routes[userType] || '/');
-  };
-  
-
-// ✅ Check If User is Authenticated
+// Check if user is authenticated
 export const isAuthenticated = () => {
-  const token = Cookies.get('token');
-  if (!token) return false;
-
-  try {
-    const decoded = jwt.decode(token);
-    return decoded ? true : false;
-  } catch (error) {
-    console.error('Token decoding error:', error.message);
-    clearAuthToken();
-    return false;
-  }
+  return !!Cookies.get('token');
 };
 
-// ✅ Get Current User Details from Token
+// Get complete decoded token data
 export const getCurrentUser = () => {
   const token = Cookies.get('token');
   if (!token) return null;
 
   try {
-    return jwt.decode(token);
+    const decoded = jwt.decode(token);
+    
+    return {
+      // Standard claims
+      userId: decoded.sub || decoded.userId,
+      userType: decoded.userType || decoded.role,
+      email: decoded.email,
+      phone: decoded.phone,
+      
+      // JWT metadata
+      issuedAt: decoded.iat ? new Date(decoded.iat * 1000) : null,
+      expiresAt: decoded.exp ? new Date(decoded.exp * 1000) : null,
+      
+      // Raw decoded token (for debugging)
+      _raw: decoded
+    };
   } catch (error) {
-    console.error('Token decoding error:', error.message);
+    console.error('Token decode error:', error);
+    clearAuthToken();
     return null;
   }
+};
+  
+
+// Logout handler
+export const logoutUser = () => {
+  clearAuthToken();
+  window.location.href = '/';
+};
+
+// Role-based redirect helper
+export const redirectByRole = (router) => {
+  const user = getCurrentUser();
+  if (!user) return router.push('/login');
+
+  const routes = {
+    super_admin: '/super_admin',
+    station: '/station',
+    user: '/dashboard'
+  };
+
+  const target = routes[user.userType] || '/';
+  return router.push(target);
 };

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import styles from '../styles/Auth.module.css';
-import { authenticateUser, storeAuthToken, redirectByRole } from '../utils/auth';
+import { authenticateUser, storeAuthToken, getCurrentUser } from '../utils/auth';
 
 export default function Login({ switchToRegister, closeAuth }) {
   const router = useRouter();
@@ -10,6 +10,23 @@ export default function Login({ switchToRegister, closeAuth }) {
   const [formErrors, setFormErrors] = useState({});
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const redirectByRole = async (userType) => {
+    const routes = {
+      super_admin: '/super_admin',
+      station: '/station',
+      user: '/user'
+    };
+
+    const targetRoute = routes[userType] || '/';
+    
+    try {
+      await router.replace(targetRoute);
+    } catch (error) {
+      console.error('Redirection failed:', error);
+      window.location.href = '/';
+    }
+  };
 
   const handleInputChange = (field) => (e) => {
     let value = e.target.value;
@@ -32,10 +49,35 @@ export default function Login({ switchToRegister, closeAuth }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+    
     setIsLoading(true);
     try {
-      const { token, userType } = await authenticateUser(formData.phone, formData.password);
+      // 1. Authenticate and get response
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: formData.phone,
+          password: formData.password
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+
+      const { token, userType, disabled } = await response.json();
+
+      // 2. Prevent disabled users from logging in
+      if (disabled === 1) {
+        throw new Error('Your account has been deactivated. Please contact support.');
+      }
+
+      // 3. Store token
       storeAuthToken(token, rememberMe);
+
+      // 4. Redirect
       await Swal.fire({
         icon: 'success',
         title: 'Login Successful!',
@@ -43,8 +85,10 @@ export default function Login({ switchToRegister, closeAuth }) {
         timer: 1500,
         showConfirmButton: false
       });
-      redirectByRole(router, userType);
-      closeAuth();
+
+      await redirectByRole(userType);
+      if (closeAuth) closeAuth();
+
     } catch (error) {
       Swal.fire({
         icon: 'error',
@@ -60,6 +104,7 @@ export default function Login({ switchToRegister, closeAuth }) {
     <>
       <h2>Sign in to your account</h2>
       <form onSubmit={handleSubmit} noValidate>
+
         <div className={`${styles.inputGroup} ${formErrors.phone ? styles.error : ''}`}>
           <label>Phone</label>
           <div className={styles.phoneInput}>

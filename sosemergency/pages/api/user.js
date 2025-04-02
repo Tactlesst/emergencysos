@@ -1,38 +1,31 @@
-import { query } from '../../../lib/db';
+import jwt from 'jsonwebtoken';
 
 export default async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
+
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
   try {
-    switch (req.method) {
-      case 'GET':
-        const users = await query('SELECT id, firstName, lastName, phone, userType FROM users');
-        return res.status(200).json(users);
+    // Verify and decode token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Return userType and other basic info
+    return res.status(200).json({
+      userType: decoded.userType,
+      phone: decoded.phone,
+      userId: decoded.userId
+    });
 
-      case 'POST':
-        const { firstName, lastName, phone, password, userType = 'user' } = req.body;
-        
-        if (!firstName || !lastName || !phone || !password) {
-          return res.status(400).json({ error: 'Missing required fields' });
-        }
-
-        const result = await query(
-          'INSERT INTO users (firstName, lastName, phone, password, userType) VALUES (?, ?, ?, ?, ?)',
-          [firstName, lastName, phone, password, userType]
-        );
-
-        return res.status(201).json({
-          id: result.insertId,
-          firstName,
-          lastName,
-          phone,
-          userType
-        });
-
-      default:
-        res.setHeader('Allow', ['GET', 'POST']);
-        return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
-    }
   } catch (error) {
-    console.error('API error:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(401).json({ 
+      message: 'Invalid token',
+      error: error.message 
+    });
   }
 }
