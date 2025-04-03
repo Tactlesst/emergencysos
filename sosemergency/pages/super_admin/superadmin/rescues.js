@@ -1,9 +1,10 @@
+import styles from '../../../styles/Admin.module.css';
 export default function ManageRescuesPage() {
     return (
-      <div>
-        <h2>🚑 Manage Rescues</h2>
-        <p>Rescue management system will be displayed here...</p>
-      </div>
+      <div className={styles.pageContainer}>
+      <h2>🏢 Manage RescuesPage</h2>
+      <p>List of RescuesPage and management tools will be displayed here...</p>
+    </div>
     );
   }
   

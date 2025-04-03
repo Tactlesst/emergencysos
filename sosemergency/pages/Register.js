@@ -27,25 +27,25 @@ export default function Register({ switchToLogin, closeAuth }) {
 
   const validateField = (field, value) => {
     const newErrors = { ...formErrors };
-    
+
     switch (field) {
       case 'firstName':
         if (!value.trim()) newErrors.firstName = 'First name is required';
         else if (value.length < 2) newErrors.firstName = 'Name too short';
         else delete newErrors.firstName;
         break;
-        
+
       case 'lastName':
         if (!value.trim()) newErrors.lastName = 'Last name is required';
         else delete newErrors.lastName;
         break;
-        
+
       case 'phone':
         if (!value) newErrors.phone = 'Phone number is required';
         else if (value.length !== 11) newErrors.phone = 'Phone must be 11 digits';
         else delete newErrors.phone;
         break;
-        
+
       case 'password':
         if (!value) newErrors.password = 'Password is required';
         else if (value.length < 8) newErrors.password = 'Minimum 8 characters';
@@ -56,26 +56,26 @@ export default function Register({ switchToLogin, closeAuth }) {
           if (formData.confirmPassword) delete newErrors.confirmPassword;
         }
         break;
-        
+
       case 'confirmPassword':
         if (!value) newErrors.confirmPassword = 'Please confirm password';
         else if (value !== formData.password) newErrors.confirmPassword = 'Passwords do not match';
         else delete newErrors.confirmPassword;
         break;
-        
+
       case 'dob':
         if (!value) newErrors.dob = 'Date of birth is required';
         else {
           const dobDate = new Date(value);
           const today = new Date();
           const minAgeDate = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
-          
+
           if (dobDate > minAgeDate) newErrors.dob = 'You must be at least 13 years old';
           else delete newErrors.dob;
         }
         break;
     }
-    
+
     setFormErrors(newErrors);
   };
 
@@ -118,7 +118,7 @@ export default function Register({ switchToLogin, closeAuth }) {
         timer: 2000,
         showConfirmButton: false
       });
-      
+
       switchToLogin();
     } catch (error) {
       Swal.fire({
@@ -151,7 +151,7 @@ export default function Register({ switchToLogin, closeAuth }) {
             />
             {formErrors.firstName && <span className={styles.errorMessage}>{formErrors.firstName}</span>}
           </div>
-          
+
           <div className={`${styles.inputGroup} ${styles.halfWidth} ${formErrors.lastName ? styles.error : ''}`}>
             <label>Last Name*</label>
             <input
@@ -165,7 +165,7 @@ export default function Register({ switchToLogin, closeAuth }) {
             {formErrors.lastName && <span className={styles.errorMessage}>{formErrors.lastName}</span>}
           </div>
         </div>
-        
+
         <div className={`${styles.inputGroup} ${formErrors.phone ? styles.error : ''}`}>
           <label>Mobile Number*</label>
           <div className={styles.phoneInput}>
@@ -188,7 +188,7 @@ export default function Register({ switchToLogin, closeAuth }) {
             </span>
           )}
         </div>
-        
+
         <div className={`${styles.inputGroup} ${formErrors.password ? styles.error : ''}`}>
           <label>Password* (min 8 characters)</label>
           <input
@@ -202,7 +202,7 @@ export default function Register({ switchToLogin, closeAuth }) {
           />
           {formErrors.password && <span className={styles.errorMessage}>{formErrors.password}</span>}
         </div>
-        
+
         <div className={`${styles.inputGroup} ${formErrors.confirmPassword ? styles.error : ''}`}>
           <label>Confirm Password*</label>
           <input
@@ -215,7 +215,7 @@ export default function Register({ switchToLogin, closeAuth }) {
           />
           {formErrors.confirmPassword && <span className={styles.errorMessage}>{formErrors.confirmPassword}</span>}
         </div>
-        
+
         <div className={`${styles.inputGroup} ${formErrors.dob ? styles.error : ''}`}>
           <label>Date of Birth*</label>
           <input
@@ -228,7 +228,7 @@ export default function Register({ switchToLogin, closeAuth }) {
           />
           {formErrors.dob && <span className={styles.errorMessage}>{formErrors.dob}</span>}
         </div>
-        
+
         <div className={`${styles.terms} ${formErrors.terms ? styles.error : ''}`}>
           <input
             type="checkbox"
@@ -246,7 +246,7 @@ export default function Register({ switchToLogin, closeAuth }) {
           </label>
           {formErrors.terms && <span className={styles.errorMessage}>{formErrors.terms}</span>}
         </div>
-        
+
         <button 
           type="submit" 
           className={styles.submitButton}

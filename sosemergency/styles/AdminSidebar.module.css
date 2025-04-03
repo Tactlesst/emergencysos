@@ -1,0 +1,56 @@
+/* Sidebar styling */
+.sidebar {
+    width: 250px;
+    background: #222;
+    color: white;
+    padding: 20px;
+    height: 100vh;
+    position: relative;
+    bottom: 1px;
+  }
+  
+  .navList {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .navItem {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .selected {
+    background-color: #444;
+  }
+  
+  /* Button for toggling sidebar (visible only on mobile) */
+  .toggleButton {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: white;
+    cursor: pointer;
+    display: block;
+    margin-bottom: 20px;
+  }
+  
+  /* Media query for desktop */
+  @media (min-width: 768px) {
+  
+    .sidebar {
+
+      left: 0;
+      top: 0;
+      transform: translateX(0); /* Always open */
+      z-index: 10;
+    }
+  }
+  
+  .sidebarClosed {
+    transform: translateX(-100%); /* Sidebar is hidden on mobile */
+  }
+  
+  .open {
+    transform: translateX(0); /* Sidebar is open */
+  }
+  

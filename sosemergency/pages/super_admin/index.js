@@ -1,23 +1,28 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getCurrentUser, logoutUser } from '@/utils/auth';
-import Sidebar from '../../components/UserSidebar';
+import Sidebar from '../../components/AdminSidebar';
+import Header from '../../components/AdminHeader';
+import Footer from '../../components/AdminFooter';
 import AnalyticsPage from '@/pages/super_admin/superadmin/analytics';
 import ManageStationsPage from '@/pages/super_admin/superadmin/stations';
 import ManageRescuesPage from '@/pages/super_admin/superadmin/rescues';
 import ManageUsersPage from '@/pages/super_admin/superadmin/users';
+import styles from '../../styles/Admin.module.css'; // Import styles
 
 export default function SuperAdminLayout() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [selectedPage, setSelectedPage] = useState('analytics'); // Default page
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar open state for mobile
 
   useEffect(() => {
+    // Check if user is logged in and has 'super_admin' rights
     const userData = getCurrentUser();
     if (!userData || userData.userType !== 'super_admin') {
-      router.replace('/');
+      router.replace('/'); // Redirect to homepage if not super_admin
     } else {
-      setUser(userData);
+      setUser(userData); // Set user data if valid
     }
 
     // Retrieve last active page from localStorage
@@ -25,23 +30,28 @@ export default function SuperAdminLayout() {
     if (savedPage) {
       setSelectedPage(savedPage);
     }
-  }, []);
+  }, [router]);
 
-  // Update localStorage when changing pages
+  // Handle page change and update localStorage
   const handlePageChange = (page) => {
     setSelectedPage(page);
     localStorage.setItem('selectedPage', page);
   };
 
   const handleLogout = () => {
-    logoutUser();
+    logoutUser(); // Handle logout
     localStorage.removeItem('selectedPage'); // Clear active page on logout
-    router.replace('/');
+    router.replace('/'); // Redirect to homepage
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen); // Toggle sidebar visibility
+  };
+
+  // Return a loading message if user data is still being fetched
   if (!user) return <p>Loading...</p>;
 
-  // Function to render the selected page
+  // Function to render the selected page content
   const renderContent = () => {
     switch (selectedPage) {
       case 'analytics':
@@ -50,36 +60,39 @@ export default function SuperAdminLayout() {
         return <ManageStationsPage />;
       case 'rescues':
         return <ManageRescuesPage />;
-        case'users':
+      case 'users':
         return <ManageUsersPage />;
       default:
-        return <AnalyticsPage />;
+        return <AnalyticsPage />; // Default to AnalyticsPage
     }
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
-      <Sidebar selectedPage={selectedPage} onPageChange={handlePageChange} />
-      <div style={{ flex: 1, padding: '20px' }}>
-        <h1>Super Admin Dashboard</h1>
-        <p>Welcome, {user.firstName}!</p>
-        <button 
-          onClick={handleLogout} 
-          style={{
-            marginBottom: '20px',
-            padding: '10px',
-            backgroundColor: 'red',
-            color: 'white',
-            border: 'none',
-            cursor: 'pointer'
-          }}
-        >
-          Logout
-        </button>
+    <div className={styles.container}>
+      {/* Header */}
+      <Header user={user} onLogout={handleLogout} onHamburgerClick={toggleSidebar} />
 
-        {/* Dynamic Content Changes Here */}
-        {renderContent()}
+      <div className={styles.mainContent}>
+        {/* Sidebar */}
+        <Sidebar 
+          selectedPage={selectedPage} 
+          onPageChange={handlePageChange} 
+          isSidebarOpen={isSidebarOpen} 
+          toggleSidebar={toggleSidebar} // Pass the toggle function
+        />
+
+        {/* Main Content */}
+        <main className={styles.content}>
+          <div className={styles.pageContainer}>
+            {renderContent()} {/* Render content based on selected page */}
+          </div>
+        </main>
       </div>
+
+      {/* Footer */}
+      <footer className={styles.footer}>
+        <Footer />
+      </footer>
     </div>
   );
 }

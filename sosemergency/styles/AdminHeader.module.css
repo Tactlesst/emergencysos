@@ -1,0 +1,44 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #333; /* Or any background color you prefer */
+    color: white;
+    position: relative;
+  }
+  
+  .hamburgerButton {
+    font-size: 2rem;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: none; /* Hidden on larger screens */
+  }
+  .hamburgerButton {
+    display: block; /* Show the hamburger button on mobile */
+  }
+  
+  .headerRight {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logoutButton {
+    background-color: red;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    cursor: pointer;
+    margin-left: 1rem;
+  }
+  
+  @media (max-width: 768px) {
+    .hamburgerButton {
+      display: block; /* Show the hamburger button on mobile */
+    }
+  
+
+  }
+  

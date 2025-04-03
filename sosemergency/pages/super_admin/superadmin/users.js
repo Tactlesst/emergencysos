@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import '../../../styles/ManageUsersPage.css';
+import styles from '../../../styles/Admin.module.css';
 
 export default function ManageUsersPage() {
   const [users, setUsers] = useState([]);
@@ -29,7 +29,6 @@ export default function ManageUsersPage() {
       currentDate.getDate()
     );
 
-    // First Name validation
     if (!userData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
     } else if (userData.firstName.length < 2) {
@@ -38,7 +37,6 @@ export default function ManageUsersPage() {
       newErrors.firstName = 'Only letters, spaces and hyphens allowed';
     }
 
-    // Last Name validation
     if (!userData.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
     } else if (userData.lastName.length < 2) {
@@ -47,21 +45,18 @@ export default function ManageUsersPage() {
       newErrors.lastName = 'Only letters, spaces and hyphens allowed';
     }
 
-    // Phone validation
     if (!userData.phone) {
       newErrors.phone = 'Phone number is required';
     } else if (!/^[0-9]{11}$/.test(userData.phone)) {
       newErrors.phone = 'Must be 11 digits (e.g., 9171234567)';
     }
 
-    // Password validation (only for new users)
     if (!isEditing && !userData.password) {
       newErrors.password = 'Password is required';
     } else if (!isEditing && userData.password.length < 8) {
       newErrors.password = 'Minimum 8 characters';
     }
 
-    // Date of Birth validation
     if (userData.dob) {
       const dobDate = new Date(userData.dob);
       if (dobDate > minAgeDate) {
@@ -95,8 +90,7 @@ export default function ManageUsersPage() {
     } else {
       setNewUser((prev) => ({ ...prev, [name]: value }));
     }
-    
-    // Clear error when user starts typing
+
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
@@ -105,9 +99,9 @@ export default function ManageUsersPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userData = editingUser || newUser;
-    
+
     if (!validateForm(userData, !!editingUser)) return;
-    
+
     setIsLoading(true);
     const url = editingUser ? `/api/users/${editingUser.id}` : '/api/users';
     const method = editingUser ? 'PUT' : 'POST';
@@ -137,9 +131,9 @@ export default function ManageUsersPage() {
   };
 
   const handleDisableUser = async (id, currentDisabled) => {
-    const newStatus = currentDisabled ? 0 : 1; // Toggle disabled status
+    const newStatus = currentDisabled ? 0 : 1;
     const confirmationText = newStatus ? 'This user will be disabled!' : 'This user will be enabled!';
-    
+
     const { isConfirmed } = await Swal.fire({
       title: 'Are you sure?',
       text: confirmationText,
@@ -147,20 +141,20 @@ export default function ManageUsersPage() {
       showCancelButton: true,
       confirmButtonText: newStatus ? 'Yes, disable!' : 'Yes, enable!',
     });
-  
+
     if (!isConfirmed) return;
-  
+
     setIsLoading(true);
     try {
       const response = await fetch(`/api/users/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ disabled: newStatus }) // Send only disabled status
+        body: JSON.stringify({ disabled: newStatus })
       });
-  
+
       if (!response.ok) throw new Error('Failed to update user status');
-  
-      await fetchUsers(); // Refresh user list
+
+      await fetchUsers();
       Swal.fire('Success!', `User has been ${newStatus ? 'disabled' : 'enabled'}.`, 'success');
     } catch (error) {
       Swal.fire('Error', error.message || 'Failed to update user status', 'error');
@@ -168,41 +162,42 @@ export default function ManageUsersPage() {
       setIsLoading(false);
     }
   };
-  
 
   return (
-    <div className="manage-users-container">
-      <h2>Manage Users</h2>
-      
-      <form onSubmit={handleSubmit} className="user-form">
-        <div className={`form-group ${errors.firstName ? 'error' : ''}`}>
-          <label>First Name*</label>
+    <div className={styles.manageUsersContainer}>
+      <h2 className={styles.pageTitle}>Manage Users</h2>
+
+      <form onSubmit={handleSubmit} className={styles.userForm}>
+        <div className={`${styles.formGroup} ${errors.firstName ? styles.error : ''}`}>
+          <label className={styles.label}>First Name*</label>
           <input
             type="text"
             name="firstName"
             placeholder="First Name"
             value={editingUser?.firstName || newUser.firstName}
             onChange={handleInputChange}
+            className={styles.input}
           />
-          {errors.firstName && <span className="error-message">{errors.firstName}</span>}
+          {errors.firstName && <span className={styles.errorMessage}>{errors.firstName}</span>}
         </div>
-        
-        <div className={`form-group ${errors.lastName ? 'error' : ''}`}>
-          <label>Last Name*</label>
+
+        <div className={`${styles.formGroup} ${errors.lastName ? styles.error : ''}`}>
+          <label className={styles.label}>Last Name*</label>
           <input
             type="text"
             name="lastName"
             placeholder="Last Name"
             value={editingUser?.lastName || newUser.lastName}
             onChange={handleInputChange}
+            className={styles.input}
           />
-          {errors.lastName && <span className="error-message">{errors.lastName}</span>}
+          {errors.lastName && <span className={styles.errorMessage}>{errors.lastName}</span>}
         </div>
-        
-        <div className={`form-group ${errors.phone ? 'error' : ''}`}>
-          <label>Phone*</label>
-          <div className="phone-input">
-            <span>+63</span>
+
+        <div className={`${styles.formGroup} ${errors.phone ? styles.error : ''}`}>
+          <label className={styles.label}>Phone*</label>
+          <div className={styles.phoneInput}>
+            <span className={styles.phonePrefix}>+63</span>
             <input
               type="tel"
               name="phone"
@@ -210,64 +205,67 @@ export default function ManageUsersPage() {
               value={editingUser?.phone || newUser.phone}
               onChange={handleInputChange}
               maxLength="11"
+              className={styles.input}
             />
           </div>
-          {errors.phone && <span className="error-message">{errors.phone}</span>}
+          {errors.phone && <span className={styles.errorMessage}>{errors.phone}</span>}
         </div>
-        
+
         {!editingUser && (
-          <div className={`form-group ${errors.password ? 'error' : ''}`}>
-            <label>Password*</label>
+          <div className={`${styles.formGroup} ${errors.password ? styles.error : ''}`}>
+            <label className={styles.label}>Password*</label>
             <input
               type="password"
               name="password"
               placeholder="Password"
               value={newUser.password}
               onChange={handleInputChange}
+              className={styles.input}
             />
-            {errors.password && <span className="error-message">{errors.password}</span>}
+            {errors.password && <span className={styles.errorMessage}>{errors.password}</span>}
           </div>
         )}
-        
-        <div className={`form-group ${errors.dob ? 'error' : ''}`}>
-          <label>Date of Birth</label>
-          <input
-  type="date"
-  name="dob"
-  value={(editingUser?.dob || newUser.dob) ? new Date(editingUser?.dob || newUser.dob).toISOString().split('T')[0] : ''} 
-  onChange={handleInputChange}
-  max={new Date().toISOString().split('T')[0]}
-/>
 
-          {errors.dob && <span className="error-message">{errors.dob}</span>}
+        <div className={`${styles.formGroup} ${errors.dob ? styles.error : ''}`}>
+          <label className={styles.label}>Date of Birth</label>
+          <input
+            type="date"
+            name="dob"
+            value={(editingUser?.dob || newUser.dob) ? new Date(editingUser?.dob || newUser.dob).toISOString().split('T')[0] : ''}
+            onChange={handleInputChange}
+            max={new Date().toISOString().split('T')[0]}
+            className={styles.input}
+          />
+          {errors.dob && <span className={styles.errorMessage}>{errors.dob}</span>}
         </div>
-        
-        <div className="form-group">
-          <label>User Type</label>
+
+        <div className={styles.formGroup}>
+          <label className={styles.label}>User Type</label>
           <select
             name="userType"
             value={editingUser?.userType || newUser.userType}
             onChange={handleInputChange}
+            className={styles.select}
           >
             <option value="user">User</option>
             <option value="station">Station</option>
             <option value="super_admin">Super Admin</option>
           </select>
         </div>
-        
-        <div className="form-actions">
+
+        <div className={styles.formActions}>
           <button 
             type="submit" 
-            className="submit-btn"
+            className={styles.submitBtn}
             disabled={isLoading}
           >
             {isLoading ? 'Processing...' : editingUser ? 'Update User' : 'Add User'}
           </button>
-          
+
           {editingUser && (
             <button
               type="button"
-              className="cancel-btn"
+              className={styles.cancelBtn}
               onClick={() => setEditingUser(null)}
               disabled={isLoading}
             >
@@ -277,14 +275,14 @@ export default function ManageUsersPage() {
         </div>
       </form>
 
-      <h3>User List</h3>
+      <h3 className={styles.userListTitle}>User List</h3>
       {isLoading ? (
-        <div className="loading-spinner"></div>
+        <div className={styles.loadingSpinner}></div>
       ) : users.length === 0 ? (
         <p>No users found</p>
       ) : (
-        <div className="users-table-container">
-          <table className="users-table">
+        <div className={styles.usersTableContainer}>
+          <table className={styles.usersTable}>
             <thead>
               <tr>
                 <th>Name</th>
@@ -298,25 +296,22 @@ export default function ManageUsersPage() {
                 <tr key={user.id}>
                   <td>{user.firstName} {user.lastName}</td>
                   <td>+63 {user.phone}</td>
-                  <td className={`user-type ${user.userType}`}>
-                    {user.userType.replace('_', ' ')}
-                  </td>
-                  <td className="actions">
+                  <td className={styles.userType}>{user.userType.replace('_', ' ')}</td>
+                  <td className={styles.actions}>
                     <button 
                       onClick={() => setEditingUser(user)}
-                      className="edit-btn"
+                      className={styles.editBtn}
                       disabled={isLoading}
                     >
                       Edit
                     </button>
                     <button 
-  onClick={() => handleDisableUser(user.id, user.disabled)}
-  className={`disable-btn ${user.disabled ? 'disabled' : ''}`}
-  disabled={isLoading}
->
-  {user.disabled ? 'Enable' : 'Disable'}
-</button>
-
+                      onClick={() => handleDisableUser(user.id, user.disabled)}
+                      className={`${styles.disableBtn} ${user.disabled ? styles.disabled : ''}`}
+                      disabled={isLoading}
+                    >
+                      {user.disabled ? 'Enable' : 'Disable'}
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -324,7 +319,6 @@ export default function ManageUsersPage() {
           </table>
         </div>
       )}
-
     </div>
   );
 }

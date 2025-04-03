@@ -1,0 +1,279 @@
+/* General layout adjustments */
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .mainContent {
+    display: flex;
+    flex: 1;
+  }
+  
+  .content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: calc(100vh - 120px);
+  }
+  
+  .pageContainer {
+    width: 80%;
+    max-width: 900px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .footer {
+    position: relative;
+    bottom: 0px;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+  }
+  
+  /* Sidebar styling */
+  .sidebar {
+    width: 250px;
+    background: #222;
+    color: white;
+    padding: 20px;
+    height: 100vh;
+  }
+  
+  .navList {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .navItem {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .selected {
+    background-color: #444;
+  }
+  
+  /* Users Table */
+  .users-table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: auto;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    padding: 10px;
+  }
+  
+  .users-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .users-table thead {
+    background-color: #f1f1f1;
+  }
+  
+  .users-table th, .users-table td {
+    padding: 10px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .users-table th {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .users-table td {
+    font-size: 1rem;
+  }
+  
+  .user-type {
+    text-transform: capitalize;
+  }
+  
+  .user-type.super_admin {
+    color: #f44336;
+  }
+  
+  .user-type.station {
+    color: #2196F3;
+  }
+  
+  .user-type.user {
+    color: #4CAF50;
+  }
+  
+  .actions button {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    margin-right: 10px;
+  }
+  
+  .edit-btn {
+    background-color: #2196F3;
+    color: white;
+  }
+  
+  .edit-btn:disabled {
+    background-color: #ccc;
+  }
+  
+  .disable-btn {
+    background-color: #FFC107;
+    color: white;
+  }
+  
+  .disable-btn.disabled {
+    background-color: #f44336;
+  }
+  
+  .disable-btn:disabled {
+    background-color: #ccc;
+  }
+  
+  /* Loading spinner */
+  .loading-spinner {
+    margin: 0 auto;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* User form styles */
+  .user-form {
+    background-color: rgb(187, 50, 50);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+  
+  .form-group input[type="date"] {
+    padding: 9px 10px;
+  }
+  
+  .form-group .error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+  }
+  
+  .form-group.error input,
+  .form-group.error select {
+    border-color: red;
+  }
+  
+  .phone-input {
+    display: flex;
+    align-items: center;
+  }
+  
+  .phone-input span {
+    margin-right: 5px;
+    font-size: 1rem;
+  }
+  
+  .phone-input input {
+    width: 100%;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .submit-btn,
+  .cancel-btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .submit-btn {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .submit-btn:disabled {
+    background-color: #ccc;
+  }
+  
+  .cancel-btn {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .cancel-btn:disabled {
+    background-color: #ccc;
+  }
+  
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .form-group label {
+      font-size: 0.9rem;
+    }
+  
+    .form-group input,
+    .form-group select {
+      font-size: 0.9rem;
+    }
+  
+    .submit-btn,
+    .cancel-btn {
+      font-size: 0.9rem;
+    }
+  
+    .users-table th,
+    .users-table td {
+      padding: 8px 10px;
+    }
+  }
+  
+  
