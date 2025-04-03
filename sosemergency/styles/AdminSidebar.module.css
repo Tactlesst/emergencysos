@@ -1,56 +1,51 @@
-/* Sidebar styling */
-.sidebar {
-    width: 250px;
-    background: #222;
-    color: white;
-    padding: 20px;
-    height: 100vh;
-    position: relative;
-    bottom: px;
-  }
-  
-  .navList {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .navItem {
-    padding: 10px;
-    cursor: pointer;
-  }
-  
-  .selected {
-    background-color: #444;
-  }
-  
-  /* Button for toggling sidebar (visible only on mobile) */
-  .toggleButton {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: white;
-    cursor: pointer;
-    display: block;
-    margin-bottom: 20px;
-  }
-  
-  /* Media query for desktop */
-  @media (min-width: 768px) {
-  
-    .sidebar {
+/* AdminSidebar.module.css */
 
-      left: 0;
-      top: 0;
-      transform: translateX(0); /* Always open */
-      z-index: 10;
-    }
+.sidebar {
+    width: 250px; /* Adjust as needed */
+    background-color: #f0f0f0; /* Example background color */
+    padding: 20px;
+    box-sizing: border-box;
+    transition: transform 0.3s ease-in-out; /* Smooth transition for open/close */
+    transform: translateX(0); /* Default position (open) */
   }
   
   .sidebarClosed {
-    transform: translateX(-100%); /* Sidebar is hidden on mobile */
+    transform: translateX(-100%); /* Move sidebar off-screen to the left */
   }
   
   .open {
-    transform: translateX(0); /* Sidebar is open */
+    transform: translateX(0);
   }
   
+  .navList {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .navItem {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .navItem:hover {
+    background-color: #e0e0e0; /* Example hover color */
+  }
+  
+  .selected {
+    background-color: #d0d0d0; /* Example selected color */
+    font-weight: bold;
+  }
+  
+  /* Hide sidebar on screens 750px and below */
+  @media (max-width: 750px) {
+    .sidebar {
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 250px; /* Or whatever width you want for mobile */
+      z-index: 1000; /* Ensure it's on top of other content */
+    }
+  }

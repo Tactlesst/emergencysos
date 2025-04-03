@@ -1,10 +1,24 @@
+import { useEffect } from 'react';
 import styles from '../styles/AdminSidebar.module.css';
 
 const Sidebar = ({ selectedPage, onPageChange, isSidebarOpen, toggleSidebar }) => {
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 750 && isSidebarOpen) {
+        toggleSidebar();
+      } else if (window.innerWidth > 750 && !isSidebarOpen) {
+        toggleSidebar();
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isSidebarOpen, toggleSidebar]);
+
   return (
     <div className={`${styles.sidebar} ${!isSidebarOpen ? styles.sidebarClosed : styles.open}`}>
-      {/* Button only visible on mobile */}
-
       <div className={styles.navList}>
         {['analytics', 'stations', 'rescues', 'users'].map((page) => (
           <div
