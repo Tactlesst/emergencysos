@@ -10,9 +10,9 @@ export default async function handler(req, res) {
   const { phone, password } = req.body;
 
   try {
-    // 1. Fetch user from database
+    // 1. Fetch user from database, including `disabled` field
     const [users] = await pool.query(
-      `SELECT id, firstName, lastName, phone, password, userType 
+      `SELECT id, firstName, lastName, phone, password, userType, disabled 
        FROM users WHERE phone = ?`,
       [phone]
     );
@@ -29,21 +29,22 @@ export default async function handler(req, res) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // 3. Create token with userType included
+    // 3. Create token
     const token = jwt.sign(
       {
         userId: user.id,
-        userType: user.userType, // Ensure this exists in your DB
+        userType: user.userType,
         phone: user.phone
       },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    // 4. Return response with token AND userType at root level
+    // 4. Return token, userType, and disabled status
     return res.status(200).json({
       token,
-      userType: user.userType, // Critical for frontend redirection
+      userType: user.userType,
+      disabled: user.disabled, // Include disabled status here
       user: {
         id: user.id,
         firstName: user.firstName,

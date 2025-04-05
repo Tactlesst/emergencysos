@@ -11,7 +11,6 @@ export default async function handler(req, res) {
       return res.status(500).json({ message: 'Error fetching users' });
     }
   } 
-  
   else if (req.method === 'POST') {
     const { firstName, lastName, phone, password, dob, userType } = req.body;
     
@@ -30,11 +29,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ message: 'Error adding user' });
     }
   } 
-  
   else if (req.method === 'PUT') {
     const { id, firstName, lastName, phone, dob, userType, password } = req.body;
-    
+
     try {
+      // Build the query dynamically
       let query = 'UPDATE users SET firstName=?, lastName=?, phone=?, dob=?, userType=?';
       let values = [firstName, lastName, phone, dob, userType];
 
@@ -48,7 +47,18 @@ export default async function handler(req, res) {
       query += ' WHERE id=?';
       values.push(id);
 
-      await pool.query(query, values);
+      // Log query and values for debugging
+      console.log('Executing query:', query);
+      console.log('With values:', values);
+
+      // Execute the update query
+      const [result] = await pool.query(query, values);
+
+      // Check if rows were affected
+      if (result.affectedRows === 0) {
+        console.log('No rows affected. Check if user ID exists or if any changes were made.');
+        return res.status(400).json({ message: 'No changes made or user not found' });
+      }
 
       return res.status(200).json({ message: 'User updated' });
     } catch (error) {
@@ -56,7 +66,6 @@ export default async function handler(req, res) {
       return res.status(500).json({ message: 'Error updating user' });
     }
   } 
-  
   else if (req.method === 'DELETE') {
     const { id } = req.query;
     try {
@@ -67,7 +76,6 @@ export default async function handler(req, res) {
       return res.status(500).json({ message: 'Error deleting user' });
     }
   } 
-  
   else {
     res.status(405).json({ message: 'Method Not Allowed' });
   }

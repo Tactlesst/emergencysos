@@ -1,8 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import styles from '../styles/Auth.module.css';
-import { authenticateUser, storeAuthToken, getCurrentUser } from '../utils/auth';
+import {
+  authenticateUser,
+  storeAuthToken,
+  getCurrentUser,
+  isAuthenticated
+} from '../utils/auth';
 
 export default function Login({ switchToRegister, closeAuth }) {
   const router = useRouter();
@@ -11,6 +16,7 @@ export default function Login({ switchToRegister, closeAuth }) {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // ✅ Redirect user based on role
   const redirectByRole = async (userType) => {
     const routes = {
       super_admin: '/super_admin',
@@ -27,6 +33,21 @@ export default function Login({ switchToRegister, closeAuth }) {
       window.location.href = '/';
     }
   };
+
+  // ✅ Auto login effect
+  useEffect(() => {
+    const autoLogin = async () => {
+      if (isAuthenticated()) {
+        const user = getCurrentUser();
+        if (user && user.userType) {
+          await redirectByRole(user.userType);
+          if (closeAuth) closeAuth();
+        }
+      }
+    };
+
+    autoLogin();
+  }, []);
 
   const handleInputChange = (field) => (e) => {
     let value = e.target.value;
@@ -52,7 +73,7 @@ export default function Login({ switchToRegister, closeAuth }) {
     
     setIsLoading(true);
     try {
-      // 1. Authenticate and get response
+      // 1. Authenticate
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -69,15 +90,14 @@ export default function Login({ switchToRegister, closeAuth }) {
 
       const { token, userType, disabled } = await response.json();
 
-      // 2. Prevent disabled users from logging in
       if (disabled === 1) {
         throw new Error('Your account has been deactivated. Please contact support.');
       }
 
-      // 3. Store token
+      // 2. Store token
       storeAuthToken(token, rememberMe);
 
-      // 4. Redirect
+      // 3. Show success
       await Swal.fire({
         icon: 'success',
         title: 'Login Successful!',
@@ -86,6 +106,7 @@ export default function Login({ switchToRegister, closeAuth }) {
         showConfirmButton: false
       });
 
+      // 4. Redirect
       await redirectByRole(userType);
       if (closeAuth) closeAuth();
 

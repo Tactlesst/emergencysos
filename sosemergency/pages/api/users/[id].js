@@ -36,28 +36,47 @@ export default async function handler(req, res) {
       const { firstName, lastName, phone, dob, userType, disabled, password } = req.body;
       console.log('Request body:', req.body);
 
-      // Hash the password if it's provided
-      let hashedPassword = null;
-      if (password) {
-        hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
-      }
-
       // Check if user exists
-      const [existingUser] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
-      if (existingUser.length === 0) {
+      const [existingUserRows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
+      if (existingUserRows.length === 0) {
         console.log('User not found:', id);
         return res.status(404).json({ message: 'User not found' });
       }
 
-      // Toggle disabled status if not explicitly provided
-      const newDisabledStatus = disabled !== undefined ? disabled : existingUser[0].disabled === 1 ? 0 : 1;
+      const existingUser = existingUserRows[0];
 
-      // Update user, including the hashed password if provided
+      // Hash the password if it's provided, otherwise use existing one
+      let hashedPassword = existingUser.password;
+      if (password) {
+        hashedPassword = await bcrypt.hash(password, 10);
+      }
+
+      // Use existing data as fallback for missing fields
+      const updatedFields = {
+        firstName: firstName ?? existingUser.firstName,
+        lastName: lastName ?? existingUser.lastName,
+        phone: phone ?? existingUser.phone,
+        dob: dob ?? existingUser.dob,
+        userType: userType ?? existingUser.userType,
+        disabled: disabled !== undefined ? disabled : existingUser.disabled,
+        password: hashedPassword
+      };
+
+      // Update the user
       const [result] = await pool.query(
         `UPDATE users 
          SET firstName = ?, lastName = ?, phone = ?, dob = ?, userType = ?, disabled = ?, password = ?
          WHERE id = ?`,
-        [firstName, lastName, phone, dob, userType, newDisabledStatus, hashedPassword, id]
+        [
+          updatedFields.firstName,
+          updatedFields.lastName,
+          updatedFields.phone,
+          updatedFields.dob,
+          updatedFields.userType,
+          updatedFields.disabled,
+          updatedFields.password,
+          id
+        ]
       );
 
       if (result.affectedRows === 0) {
@@ -65,8 +84,8 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: 'Failed to update user' });
       }
 
-      console.log(`User ${id} updated successfully. New disabled status: ${newDisabledStatus}`);
-      return res.status(200).json({ message: 'User updated successfully', disabled: newDisabledStatus });
+      console.log(`User ${id} updated successfully. New disabled status: ${updatedFields.disabled}`);
+      return res.status(200).json({ message: 'User updated successfully', disabled: updatedFields.disabled });
     } 
     
     else {

@@ -1,11 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../styles/Auth.module.css';
 import Login from './Login';
 import Register from './Register';
+import { isAuthenticated, getCurrentUser } from '../utils/auth';
+import { useRouter } from 'next/router';
 
 export default function Auth() {
   const [activeForm, setActiveForm] = useState('selection');
-  
+  const router = useRouter();
+
+  // ✅ Auto login effect
+  useEffect(() => {
+    const autoLogin = async () => {
+      if (isAuthenticated()) {
+        const user = getCurrentUser();
+        if (user && user.userType) {
+          await redirectByRole(user.userType);
+          setActiveForm('selection');
+        }
+      }
+    };
+
+    autoLogin();
+  }, []);
+
+  // ✅ Redirect user based on role
+  const redirectByRole = async (userType) => {
+    const routes = {
+      super_admin: '/super_admin',
+      station: '/station',
+      user: '/user'
+    };
+
+    const targetRoute = routes[userType] || '/';
+
+    try {
+      await router.replace(targetRoute);
+    } catch (error) {
+      console.error('Redirection failed:', error);
+      window.location.href = '/';
+    }
+  };
+
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modal}>

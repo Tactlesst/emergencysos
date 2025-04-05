@@ -23,18 +23,14 @@ export default function ManageUsersPage() {
   const validateForm = (userData, isEditing = false) => {
     const newErrors = {};
     const currentDate = new Date();
-    const minAgeDate = new Date(
-      currentDate.getFullYear() - 13,
-      currentDate.getMonth(),
-      currentDate.getDate()
-    );
+    const minAgeDate = new Date(currentDate.getFullYear() - 13, currentDate.getMonth(), currentDate.getDate());
 
     if (!userData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
     } else if (userData.firstName.length < 2) {
       newErrors.firstName = 'Minimum 2 characters';
     } else if (!/^[a-zA-Z\s-]+$/.test(userData.firstName)) {
-      newErrors.firstName = 'Only letters, spaces and hyphens allowed';
+      newErrors.firstName = 'Only letters, spaces, and hyphens allowed';
     }
 
     if (!userData.lastName.trim()) {
@@ -42,7 +38,7 @@ export default function ManageUsersPage() {
     } else if (userData.lastName.length < 2) {
       newErrors.lastName = 'Minimum 2 characters';
     } else if (!/^[a-zA-Z\s-]+$/.test(userData.lastName)) {
-      newErrors.lastName = 'Only letters, spaces and hyphens allowed';
+      newErrors.lastName = 'Only letters, spaces, and hyphens allowed';
     }
 
     if (!userData.phone) {
@@ -55,6 +51,8 @@ export default function ManageUsersPage() {
       newErrors.password = 'Password is required';
     } else if (!isEditing && userData.password.length < 8) {
       newErrors.password = 'Minimum 8 characters';
+    } else if (isEditing && userData.password && userData.password.length < 8) {
+      newErrors.password = 'Minimum 8 characters if changing password';
     }
 
     if (userData.dob) {
@@ -106,11 +104,16 @@ export default function ManageUsersPage() {
     const url = editingUser ? `/api/users/${editingUser.id}` : '/api/users';
     const method = editingUser ? 'PUT' : 'POST';
 
+    const payload = { ...userData };
+    if (editingUser && !userData.password) {
+      delete payload.password;
+    }
+
     try {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
@@ -211,20 +214,20 @@ export default function ManageUsersPage() {
           {errors.phone && <span className={styles.errorMessage}>{errors.phone}</span>}
         </div>
 
-        {!editingUser && (
-          <div className={`${styles.formGroup} ${errors.password ? styles.error : ''}`}>
-            <label className={styles.label}>Password*</label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={newUser.password}
-              onChange={handleInputChange}
-              className={styles.input}
-            />
-            {errors.password && <span className={styles.errorMessage}>{errors.password}</span>}
-          </div>
-        )}
+        <div className={`${styles.formGroup} ${errors.password ? styles.error : ''}`}>
+          <label className={styles.label}>
+            Password{editingUser ? ' (leave blank to keep current)' : '*'}
+          </label>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={editingUser ? editingUser.password || '' : newUser.password}
+            onChange={handleInputChange}
+            className={styles.input}
+          />
+          {errors.password && <span className={styles.errorMessage}>{errors.password}</span>}
+        </div>
 
         <div className={`${styles.formGroup} ${errors.dob ? styles.error : ''}`}>
           <label className={styles.label}>Date of Birth</label>
@@ -254,14 +257,9 @@ export default function ManageUsersPage() {
         </div>
 
         <div className={styles.formActions}>
-          <button 
-            type="submit" 
-            className={styles.submitBtn}
-            disabled={isLoading}
-          >
+          <button type="submit" className={styles.submitBtn} disabled={isLoading}>
             {isLoading ? 'Processing...' : editingUser ? 'Update User' : 'Add User'}
           </button>
-
           {editingUser && (
             <button
               type="button"
@@ -281,43 +279,25 @@ export default function ManageUsersPage() {
       ) : users.length === 0 ? (
         <p>No users found</p>
       ) : (
-        <div className={styles.usersTableContainer}>
-          <table className={styles.usersTable}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Type</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(user => (
-                <tr key={user.id}>
-                  <td>{user.firstName} {user.lastName}</td>
-                  <td>+63 {user.phone}</td>
-                  <td className={styles.userType}>{user.userType.replace('_', ' ')}</td>
-                  <td className={styles.actions}>
-                    <button 
-                      onClick={() => setEditingUser(user)}
-                      className={styles.editBtn}
-                      disabled={isLoading}
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDisableUser(user.id, user.disabled)}
-                      className={`${styles.disableBtn} ${user.disabled ? styles.disabled : ''}`}
-                      disabled={isLoading}
-                    >
-                      {user.disabled ? 'Enable' : 'Disable'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className={styles.userList}>
+          {users.map((user) => (
+            <li key={user.id} className={styles.userItem}>
+              <span>{user.firstName} {user.lastName}</span>
+              <button
+                onClick={() => handleDisableUser(user.id, user.disabled)}
+                className={styles.toggleDisableBtn}
+              >
+                {user.disabled ? 'Enable' : 'Disable'}
+              </button>
+              <button
+                onClick={() => setEditingUser(user)}
+                className={styles.editBtn}
+              >
+                Edit
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
