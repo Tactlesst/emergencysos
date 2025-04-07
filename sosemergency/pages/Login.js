@@ -24,13 +24,13 @@ export default function Login({ switchToRegister, closeAuth }) {
       user: '/user'
     };
 
-    const targetRoute = routes[userType] || '/';
+    const targetRoute = routes[userType] || '/auth';
     
     try {
       await router.replace(targetRoute);
     } catch (error) {
       console.error('Redirection failed:', error);
-      window.location.href = '/';
+      window.location.href = '/auth';
     }
   };
 

@@ -20,7 +20,7 @@ export default function SuperAdminLayout() {
     // Check if user is logged in and has 'super_admin' rights
     const userData = getCurrentUser();
     if (!userData || userData.userType !== 'super_admin') {
-      router.replace('/'); // Redirect to homepage if not super_admin
+      router.replace('/auth'); // Redirect to homepage if not super_admin
     } else {
       setUser(userData); // Set user data if valid
     }
@@ -41,7 +41,7 @@ export default function SuperAdminLayout() {
   const handleLogout = () => {
     logoutUser(); // Handle logout
     localStorage.removeItem('selectedPage'); // Clear active page on logout
-    router.replace('/'); // Redirect to homepage
+    router.replace('/auth'); // Redirect to homepage
   };
 
   const toggleSidebar = () => {

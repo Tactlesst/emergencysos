@@ -95,7 +95,7 @@ export const getCurrentUser = () => {
 // Logout user and redirect
 export const logoutUser = () => {
   clearAuthToken();
-  window.location.href = '/';
+  window.location.href = '/auth';
 };
 
 // Redirect by user role
@@ -109,6 +109,6 @@ export const redirectByRole = (router) => {
     user: '/dashboard'
   };
 
-  const target = routes[user.userType] || '/';
+  const target = routes[user.userType] || '/auth';
   return router.push(target);
 };

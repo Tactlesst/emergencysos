@@ -29,7 +29,18 @@ export default async function handler(req, res) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // 3. Create token
+    // 3. Check if user is disabled
+    if (user.disabled === 1) {
+      return res.status(403).json({ message: 'Your account has been deactivated. Please contact support.' });
+    }
+
+    // 4. Log the login
+    await pool.query(
+      'INSERT INTO login_logs (user_id) VALUES (?)',
+      [user.id]
+    );
+
+    // 5. Create token
     const token = jwt.sign(
       {
         userId: user.id,
@@ -40,11 +51,11 @@ export default async function handler(req, res) {
       { expiresIn: '1h' }
     );
 
-    // 4. Return token, userType, and disabled status
+    // 6. Return token, userType, and user info
     return res.status(200).json({
       token,
       userType: user.userType,
-      disabled: user.disabled, // Include disabled status here
+      disabled: user.disabled,
       user: {
         id: user.id,
         firstName: user.firstName,
