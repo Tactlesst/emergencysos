@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import styles from '../../../styles/Admin.module.css';
 
 export default function ManageUsersPage() {
   const [users, setUsers] = useState([]);
@@ -167,88 +166,86 @@ export default function ManageUsersPage() {
   };
 
   return (
-    <div className={styles.manageUsersContainer}>
-      <h2 className={styles.pageTitle}>Manage Users</h2>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <h2 className="text-2xl font-bold mb-6 text-center">Manage Users</h2>
 
-      <form onSubmit={handleSubmit} className={styles.userForm}>
-        <div className={`${styles.formGroup} ${errors.firstName ? styles.error : ''}`}>
-          <label className={styles.label}>First Name*</label>
-          <input
-            type="text"
-            name="firstName"
-            placeholder="First Name"
-            value={editingUser?.firstName || newUser.firstName}
-            onChange={handleInputChange}
-            className={styles.input}
-          />
-          {errors.firstName && <span className={styles.errorMessage}>{errors.firstName}</span>}
-        </div>
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
+        {[
+          { label: 'First Name*', name: 'firstName', type: 'text' },
+          { label: 'Last Name*', name: 'lastName', type: 'text' },
+        ].map(({ label, name, type }) => (
+          <div key={name}>
+            <label className="block font-medium mb-1">{label}</label>
+            <input
+              type={type}
+              name={name}
+              value={editingUser?.[name] || newUser[name]}
+              onChange={handleInputChange}
+              className={`w-full border rounded px-3 py-2 ${
+                errors[name] ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors[name] && <p className="text-red-500 text-sm mt-1">{errors[name]}</p>}
+          </div>
+        ))}
 
-        <div className={`${styles.formGroup} ${errors.lastName ? styles.error : ''}`}>
-          <label className={styles.label}>Last Name*</label>
-          <input
-            type="text"
-            name="lastName"
-            placeholder="Last Name"
-            value={editingUser?.lastName || newUser.lastName}
-            onChange={handleInputChange}
-            className={styles.input}
-          />
-          {errors.lastName && <span className={styles.errorMessage}>{errors.lastName}</span>}
-        </div>
-
-        <div className={`${styles.formGroup} ${errors.phone ? styles.error : ''}`}>
-          <label className={styles.label}>Phone*</label>
-          <div className={styles.phoneInput}>
-            <span className={styles.phonePrefix}>+63</span>
+        <div>
+          <label className="block font-medium mb-1">Phone*</label>
+          <div className="flex items-center">
+            <span className="px-2 bg-gray-100 border border-r-0 border-gray-300 rounded-l">+63</span>
             <input
               type="tel"
               name="phone"
+              maxLength="11"
               placeholder="9171234567"
               value={editingUser?.phone || newUser.phone}
               onChange={handleInputChange}
-              maxLength="11"
-              className={styles.input}
+              className={`w-full border px-3 py-2 rounded-r ${
+                errors.phone ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
           </div>
-          {errors.phone && <span className={styles.errorMessage}>{errors.phone}</span>}
+          {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
         </div>
 
-        <div className={`${styles.formGroup} ${errors.password ? styles.error : ''}`}>
-          <label className={styles.label}>
+        <div>
+          <label className="block font-medium mb-1">
             Password{editingUser ? ' (leave blank to keep current)' : '*'}
           </label>
           <input
             type="password"
             name="password"
-            placeholder="Password"
             value={editingUser ? editingUser.password || '' : newUser.password}
             onChange={handleInputChange}
-            className={styles.input}
+            className={`w-full border px-3 py-2 rounded ${
+              errors.password ? 'border-red-500' : 'border-gray-300'
+            }`}
           />
-          {errors.password && <span className={styles.errorMessage}>{errors.password}</span>}
+          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
         </div>
 
-        <div className={`${styles.formGroup} ${errors.dob ? styles.error : ''}`}>
-          <label className={styles.label}>Date of Birth</label>
+        <div>
+          <label className="block font-medium mb-1">Date of Birth</label>
           <input
             type="date"
             name="dob"
             value={(editingUser?.dob || newUser.dob) ? new Date(editingUser?.dob || newUser.dob).toISOString().split('T')[0] : ''}
             onChange={handleInputChange}
             max={new Date().toISOString().split('T')[0]}
-            className={styles.input}
+            className={`w-full border px-3 py-2 rounded ${
+              errors.dob ? 'border-red-500' : 'border-gray-300'
+            }`}
           />
-          {errors.dob && <span className={styles.errorMessage}>{errors.dob}</span>}
+          {errors.dob && <p className="text-red-500 text-sm mt-1">{errors.dob}</p>}
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>User Type</label>
+        <div>
+          <label className="block font-medium mb-1">User Type</label>
           <select
             name="userType"
             value={editingUser?.userType || newUser.userType}
             onChange={handleInputChange}
-            className={styles.select}
+            className="w-full border px-3 py-2 rounded border-gray-300"
           >
             <option value="user">User</option>
             <option value="station">Station</option>
@@ -256,15 +253,19 @@ export default function ManageUsersPage() {
           </select>
         </div>
 
-        <div className={styles.formActions}>
-          <button type="submit" className={styles.submitBtn} disabled={isLoading}>
+        <div className="flex gap-3 mt-4">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            disabled={isLoading}
+          >
             {isLoading ? 'Processing...' : editingUser ? 'Update User' : 'Add User'}
           </button>
           {editingUser && (
             <button
               type="button"
-              className={styles.cancelBtn}
               onClick={() => setEditingUser(null)}
+              className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
               disabled={isLoading}
             >
               Cancel
@@ -273,28 +274,31 @@ export default function ManageUsersPage() {
         </div>
       </form>
 
-      <h3 className={styles.userListTitle}>User List</h3>
+      <h3 className="text-xl font-semibold mt-10 mb-4">User List</h3>
+
       {isLoading ? (
-        <div className={styles.loadingSpinner}></div>
+        <div className="text-center text-gray-500">Loading...</div>
       ) : users.length === 0 ? (
-        <p>No users found</p>
+        <p className="text-gray-600">No users found</p>
       ) : (
-        <ul className={styles.userList}>
+        <ul className="space-y-2">
           {users.map((user) => (
-            <li key={user.id} className={styles.userItem}>
+            <li key={user.id} className="flex items-center justify-between border p-3 rounded bg-white shadow-sm">
               <span>{user.firstName} {user.lastName}</span>
-              <button
-                onClick={() => handleDisableUser(user.id, user.disabled)}
-                className={styles.toggleDisableBtn}
-              >
-                {user.disabled ? 'Enable' : 'Disable'}
-              </button>
-              <button
-                onClick={() => setEditingUser(user)}
-                className={styles.editBtn}
-              >
-                Edit
-              </button>
+              <div className="space-x-2">
+                <button
+                  onClick={() => handleDisableUser(user.id, user.disabled)}
+                  className="px-3 py-1 text-sm rounded bg-yellow-500 text-white hover:bg-yellow-600"
+                >
+                  {user.disabled ? 'Enable' : 'Disable'}
+                </button>
+                <button
+                  onClick={() => setEditingUser(user)}
+                  className="px-3 py-1 text-sm rounded bg-green-600 text-white hover:bg-green-700"
+                >
+                  Edit
+                </button>
+              </div>
             </li>
           ))}
         </ul>
