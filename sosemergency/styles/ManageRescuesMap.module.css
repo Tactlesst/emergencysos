@@ -1,0 +1,83 @@
+.mapPageContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2c3e50;
+    color: white;
+    padding: 1rem;
+  }
+  
+  .menuButton,
+  .notificationButton {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+  }
+  
+  .controls {
+    display: flex;
+    flex-direction: column;
+    background-color: #ecf0f1;
+    padding: 0.5rem 1rem;
+    overflow-x: auto;
+    gap: 0.5rem;
+  }
+  
+  .viewTabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .viewTabs button {
+    padding: 0.4rem 0.8rem;
+    border: none;
+    background-color: #bdc3c7;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .activeTab {
+    background-color: #3498db;
+    color: white;
+  }
+  
+  .severityFilter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+  
+  .radiusInfo {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .mapArea {
+    flex-grow: 1;
+    position: relative;
+    height: 100%;
+  }
+  
+  .mapArea > div {
+    height: 100%;
+  }
+  
+  .footerInfo {
+    text-align: center;
+    background-color: #f1f1f1;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+  

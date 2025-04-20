@@ -1,51 +1,36 @@
-/* AdminSidebar.module.css */
-
 .sidebar {
-    width: 250px; /* Adjust as needed */
-    background-color: #f0f0f0; /* Example background color */
-    padding: 20px;
-    box-sizing: border-box;
-    transition: transform 0.3s ease-in-out; /* Smooth transition for open/close */
-    transform: translateX(0); /* Default position (open) */
-  }
-  
-  .sidebarClosed {
-    transform: translateX(-100%); /* Move sidebar off-screen to the left */
-  }
-  
-  .open {
-    transform: translateX(0);
-  }
-  
-  .navList {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .navItem {
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .navItem:hover {
-    background-color: #e0e0e0; /* Example hover color */
-  }
-  
-  .selected {
-    background-color: #d0d0d0; /* Example selected color */
-    font-weight: bold;
-  }
-  
-  /* Hide sidebar on screens 750px and below */
-  @media (max-width: 750px) {
-    .sidebar {
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: 250px; /* Or whatever width you want for mobile */
-      z-index: 1000; /* Ensure it's on top of other content */
-    }
-  }
+  width: 250px;
+  background-color: #1e1e1e;
+  color: white;
+  transition: transform 0.3s ease-in-out;
+  padding: 20px;
+}
+
+.sidebarClosed {
+  transform: translateX(-100%);
+}
+
+.open {
+  transform: translateX(0);
+}
+
+.navList {
+  display: flex;
+  flex-direction: column;
+}
+
+.navItem {
+  padding: 12px;
+  margin: 6px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.navItem:hover {
+  background-color: #333;
+}
+
+.selected {
+  background-color: #555;
+}
