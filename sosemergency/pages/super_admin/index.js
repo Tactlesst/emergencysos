@@ -8,6 +8,13 @@ import AnalyticsPage from '@/pages/super_admin/superadmin/analytics';
 import ManageStationsPage from '@/pages/super_admin/superadmin/stations';
 import ManageRescuesPage from '@/pages/super_admin/superadmin/rescues';
 import ManageUsersPage from '@/pages/super_admin/superadmin/users';
+import DashboardPage from '@/pages/super_admin/superadmin/dashboard';
+import DeploymentsPage from '@/pages/super_admin/superadmin/deployments';
+import TasksPage from '@/pages/super_admin/superadmin/tasks';
+import LiveAlertsPage from '@/pages/super_admin/superadmin/live-alerts';
+import ReportsPage from '@/pages/super_admin/superadmin/reports';
+import SettingsPage from '@/pages/super_admin/superadmin/settings';
+
 
 export default function SuperAdminLayout() {
   const router = useRouter(); // <-- Using the useRouter hook
@@ -48,6 +55,8 @@ export default function SuperAdminLayout() {
 
   const renderContent = () => {
     switch (selectedPage) {
+      case 'dashboard':
+        return <DashboardPage />;
       case 'analytics':
         return <AnalyticsPage />;
       case 'stations':
@@ -56,10 +65,21 @@ export default function SuperAdminLayout() {
         return <ManageRescuesPage />;
       case 'users':
         return <ManageUsersPage />;
+      case 'deployments':
+        return <DeploymentsPage />;
+      case 'tasks':
+        return <TasksPage />;
+      case 'live alerts':
+        return <LiveAlertsPage />;
+      case 'reports':
+        return <ReportsPage />;
+      case 'settings':
+        return <SettingsPage />;
       default:
-        return <AnalyticsPage />;
+        return <DashboardPage />;
     }
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">

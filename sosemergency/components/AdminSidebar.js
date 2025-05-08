@@ -10,10 +10,11 @@ const Sidebar = ({ selectedPage, onPageChange, isSidebarOpen, toggleSidebar }) =
         toggleSidebar();
       }
     };
-
+  
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isSidebarOpen, toggleSidebar]);
+  }, [isSidebarOpen]);
+  
 
   const menuItems = [
     'dashboard',
