@@ -26,6 +26,7 @@ ChartJS.register(
 
 export default function AnalyticsPage() {
   const [userCount, setUserCount] = useState(null);
+  const [userBreakdown, setUserBreakdown] = useState([]);
   const [loginData, setLoginData] = useState({ labels: [], data: [] });
   const [registrationData, setRegistrationData] = useState({ labels: [], data: [] });
   const [activeUsers, setActiveUsers] = useState(0);
@@ -48,7 +49,8 @@ export default function AnalyticsPage() {
         const regDataRes = await regRes.json();
         const activeData = await activeRes.json();
 
-        setUserCount(userCountData.count);
+        setUserCount(userCountData.totalUsers);
+        setUserBreakdown(userCountData.breakdown);
         setActiveUsers(activeData.activeUsers || 0);
 
         setLoginData({
@@ -162,9 +164,22 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <ActivityCard title="Recent Logins (Last 10)" data={loginData} color="green" />
         <ActivityCard title="Recent Registrations (Last 10)" data={registrationData} color="purple" />
+      </div>
+
+      {/* Breakdown by userType */}
+      <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900 pb-2 border-b mb-4">User Type Breakdown</h3>
+        <ul className="space-y-2">
+          {userBreakdown.map((item, i) => (
+            <li key={i} className="flex justify-between text-sm text-gray-700">
+              <span className="capitalize">{item.userType}</span>
+              <span className="font-semibold">{item.count}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

@@ -3,7 +3,9 @@ import db from '@/lib/db';
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
-      const [deployments] = await db.query('SELECT * FROM deployments ORDER BY created_at DESC');
+      const [deployments] = await db.query(
+        `SELECT id, deployment_name AS name, status, location, start_time FROM deployments ORDER BY created_at DESC`
+      );
       res.status(200).json(deployments);
     } catch (error) {
       console.error('Error fetching deployments:', error);
@@ -18,7 +20,7 @@ export default async function handler(req, res) {
 
     try {
       const [result] = await db.query(
-        'INSERT INTO deployments (name, status, location, start_time) VALUES (?, ?, ?, ?)',
+        `INSERT INTO deployments (deployment_name, status, location, start_time) VALUES (?, ?, ?, ?)`,
         [name, status, location, start_time]
       );
 

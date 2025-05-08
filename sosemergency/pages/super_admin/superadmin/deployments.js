@@ -15,7 +15,6 @@ export default function DeploymentsPage() {
 
   const headers = ['Deployment Name', 'Status', 'Location', 'Start Time'];
 
-  // Fetch deployments on component mount
   useEffect(() => {
     const fetchDeployments = async () => {
       try {
@@ -29,7 +28,6 @@ export default function DeploymentsPage() {
     fetchDeployments();
   }, []);
 
-  // Handle new deployment submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -45,6 +43,7 @@ export default function DeploymentsPage() {
       });
 
       const data = await response.json();
+      console.log('New deployment response:', data);
 
       if (response.ok) {
         setDeployments((prev) => [...prev, data]);
@@ -68,7 +67,6 @@ export default function DeploymentsPage() {
 
       <Table headers={headers} data={deployments} />
 
-      {/* Modal for Adding a New Deployment */}
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
