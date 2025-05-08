@@ -1,31 +1,41 @@
-import jwt from 'jsonwebtoken';
+// pages/api/reports.js
+import db from '@/lib/db';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
-
-  const token = req.headers.authorization?.split(' ')[1];
-  
-  if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
+  const { type } = req.query;
 
   try {
-    // Verify and decode token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Return userType and other basic info
-    return res.status(200).json({
-      userType: decoded.userType,
-      phone: decoded.phone,
-      userId: decoded.userId
-    });
+    let query = '';
+    switch (type) {
+      case 'user_activity':
+        query = `
+          SELECT id, first_name, last_name, mobile, role, last_login
+          FROM users
+          ORDER BY last_login DESC
+        `;
+        break;
+      case 'deployments':
+        query = `
+          SELECT id, name, location, status, start_time
+          FROM deployments
+          ORDER BY start_time DESC
+        `;
+        break;
+      case 'incidents':
+        query = `
+          SELECT id, type, location, status, reported_at
+          FROM incidents
+          ORDER BY reported_at DESC
+        `;
+        break;
+      default:
+        return res.status(400).json({ error: 'Invalid report type' });
+    }
 
+    const [results] = await db.query(query);
+    res.status(200).json(results);
   } catch (error) {
-    return res.status(401).json({ 
-      message: 'Invalid token',
-      error: error.message 
-    });
+    console.error('Error fetching report:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 }

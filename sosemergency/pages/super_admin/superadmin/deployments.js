@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Table } from '@/components/ui/table';
 import { Dialog } from '@headlessui/react';
 
 export default function DeploymentsPage() {
@@ -18,19 +17,19 @@ export default function DeploymentsPage() {
   useEffect(() => {
     const fetchDeployments = async () => {
       try {
-        const response = await fetch('/api/deployments');
+        const response = await fetch('/api/deployments'); // 👈 This is the fetch
         const data = await response.json();
-        setDeployments(data);
+        setDeployments(Array.isArray(data) ? data : []); // Safe check to avoid `.map` error
       } catch (error) {
         console.error('Error fetching deployments:', error);
       }
     };
     fetchDeployments();
   }, []);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!newDeployment.name || !newDeployment.location || !newDeployment.start_time) return;
 
     try {
@@ -43,7 +42,6 @@ export default function DeploymentsPage() {
       });
 
       const data = await response.json();
-      console.log('New deployment response:', data);
 
       if (response.ok) {
         setDeployments((prev) => [...prev, data]);
@@ -65,7 +63,29 @@ export default function DeploymentsPage() {
 
       <Button onClick={() => setIsOpen(true)}>Add Deployment</Button>
 
-      <Table headers={headers} data={deployments} />
+      <div className="mt-6 overflow-x-auto border rounded">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-100">
+            <tr>
+              {headers.map((header, idx) => (
+                <th key={idx} className="px-4 py-2 text-left font-medium text-sm text-gray-700">
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {deployments.map((item) => (
+              <tr key={item.id}>
+                <td className="px-4 py-2">{item.name}</td>
+                <td className="px-4 py-2">{item.status}</td>
+                <td className="px-4 py-2">{item.location}</td>
+                <td className="px-4 py-2">{item.start_time}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
@@ -103,9 +123,7 @@ export default function DeploymentsPage() {
                 className="w-full px-3 py-2 border rounded"
               />
               <div className="flex justify-end space-x-2">
-                <Button type="button" onClick={() => setIsOpen(false)}>
-                  Cancel
-                </Button>
+                <Button type="button" onClick={() => setIsOpen(false)}>Cancel</Button>
                 <Button type="submit">Add Deployment</Button>
               </div>
             </form>

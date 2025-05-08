@@ -4,9 +4,9 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       const [deployments] = await db.query(
-        `SELECT id, deployment_name AS name, status, location, start_time FROM deployments ORDER BY created_at DESC`
+        `SELECT id, name AS name, status, location, start_time FROM deployments ORDER BY created_at DESC`
       );
-      res.status(200).json(deployments);
+      res.status(200).json(deployments); // ✅ Return the rows directly
     } catch (error) {
       console.error('Error fetching deployments:', error);
       res.status(500).json({ error: 'Failed to fetch deployments' });
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
     try {
       const [result] = await db.query(
-        `INSERT INTO deployments (deployment_name, status, location, start_time) VALUES (?, ?, ?, ?)`,
+        `INSERT INTO deployments (name, status, location, start_time) VALUES (?, ?, ?, ?)`,
         [name, status, location, start_time]
       );
 
