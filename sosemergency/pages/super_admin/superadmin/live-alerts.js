@@ -62,6 +62,19 @@ export default function LiveAlertsPage() {
     setIsTestAlertOpen(true);
   };
 
+  const handleOpenAddAlert = () => {
+    const now = new Date();
+    const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    setNewAlert({
+      alert_type: 'Fire',
+      location: 'Building A',
+      status: 'Active',
+      time: formattedTime,
+    });
+    setIsOpen(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!newAlert.alert_type || !newAlert.location || !newAlert.time) return;
@@ -97,7 +110,7 @@ export default function LiveAlertsPage() {
         <h1 className="text-3xl font-bold">Live Alerts</h1>
         <div className="space-x-2">
           <Button onClick={handleAddTestAlert}>Add Test Alert</Button>
-          <Button onClick={() => setIsOpen(true)}>Add Alert</Button>
+          <Button onClick={handleOpenAddAlert}>Add Alert</Button>
         </div>
       </div>
 

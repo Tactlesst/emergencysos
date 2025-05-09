@@ -6,10 +6,10 @@ export default function DeploymentsPage() {
   const [deployments, setDeployments] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [newDeployment, setNewDeployment] = useState({
-    name: '',
+    name: 'Fire Rescue Operation',
     status: 'Active',
-    location: '',
-    start_time: '',
+    location: 'Building 3, Floor 4',
+    start_time: new Date().toISOString().slice(0, 16), // default to current date and time
   });
 
   const headers = ['Deployment Name', 'Status', 'Location', 'Start Time'];

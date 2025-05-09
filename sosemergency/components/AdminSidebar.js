@@ -22,7 +22,6 @@ const Sidebar = ({ selectedPage, onPageChange, isSidebarOpen, toggleSidebar }) =
     'stations',
     'rescues',
     'deployments',
-    'tasks',
     'live alerts',
     'reports',
     'users',

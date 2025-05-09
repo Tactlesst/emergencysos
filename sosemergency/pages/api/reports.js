@@ -7,7 +7,12 @@ export default async function handler(req, res) {
     let query = '';
     switch (type) {
       case 'user_activity':
-        query = `SELECT id, email, role, last_login, created_at FROM users ORDER BY last_login DESC`;
+        // Correct query for user activity data from the 'users' table
+        query = `
+          SELECT id, CONCAT(firstName, ' ', lastName) AS name, role, last_login, created_at
+          FROM users
+          ORDER BY login_logs DESC
+        `;
         break;
       case 'deployments':
         query = `SELECT id, name, status, location, start_time, created_at FROM deployments ORDER BY start_time DESC`;
