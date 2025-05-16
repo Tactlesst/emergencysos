@@ -1,104 +1,82 @@
 // components/RescueMap.js
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
-// Import Leaflet and AwesomeMarkers styles
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.awesome-markers/dist/leaflet.awesome-markers.css';
 import 'leaflet.awesome-markers';
 
-// --- Define your AwesomeMarkers-based icons ---
+import rescuesData from '../data/rescues';  // Adjust path as needed
+
 const highSeverityIcon = L.AwesomeMarkers.icon({
-    icon: 'exclamation-triangle',
-    prefix: 'fa',
-    markerColor: 'red'
+  icon: 'car-crash',
+  prefix: 'fa',
+  markerColor: 'red',
 });
 
 const mediumSeverityIcon = L.AwesomeMarkers.icon({
-    icon: 'exclamation-circle',
-    prefix: 'fa',
-    markerColor: 'orange'
+  icon: 'car-side',
+  prefix: 'fa',
+  markerColor: 'orange',
 });
 
 const lowSeverityIcon = L.AwesomeMarkers.icon({
-    icon: 'info-circle',
-    prefix: 'fa',
-    markerColor: 'blue'
-});
-
-const defaultIcon = L.AwesomeMarkers.icon({
-    icon: 'question-circle',
-    prefix: 'fa',
-    markerColor: 'gray'
+  icon: 'car',
+  prefix: 'fa',
+  markerColor: 'blue',
 });
 
 const getIconBySeverity = (severity) => {
-    switch (severity?.toLowerCase()) {
-        case 'high':
-            return highSeverityIcon;
-        case 'medium':
-            return mediumSeverityIcon;
-        case 'low':
-            return lowSeverityIcon;
-        default:
-            return defaultIcon;
-    }
+  switch (severity?.toLowerCase()) {
+    case 'high':
+      return highSeverityIcon;
+    case 'medium':
+      return mediumSeverityIcon;
+    case 'low':
+      return lowSeverityIcon;
+    default:
+      return lowSeverityIcon;
+  }
 };
 
-// ✅ Sample rescues near Balingasag
-const sampleRescues = [
-    {
-        id: 1,
-        name: 'Flooded Area - Brgy. Napaliran',
-        severity: 'high',
-        position: [8.7430, 124.7790]
-    },
-    {
-        id: 2,
-        name: 'Evacuation Needed - Brgy. San Alonzo',
-        severity: 'medium',
-        position: [8.7415, 124.7752]
-    },
-    {
-        id: 3,
-        name: 'Road Blocked - National Highway',
-        severity: 'low',
-        position: [8.7445, 124.7815]
-    }
-];
+const RescueMap = () => {
+  const [rescues, setRescues] = useState([]);
 
-const RescueMap = ({ rescues = sampleRescues, center, zoom }) => {
-    const mapCenter = center || [8.7422, 124.7776]; // 📍 Balingasag
-    const mapZoom = zoom || 14;
+  useEffect(() => {
+    // Load rescues from imported data
+    setRescues(rescuesData);
+  }, []);
 
-    return (
-        <MapContainer
-            center={mapCenter}
-            zoom={mapZoom}
-            scrollWheelZoom={true}
-            style={{ height: '100%', width: '100%' }}
-        >
-            <TileLayer
+  const mapCenter = [8.7422, 124.7776];
+  const mapZoom = 14;
+
+  return (
+    <MapContainer
+      center={mapCenter}
+      zoom={mapZoom}
+      scrollWheelZoom={true}
+      style={{ height: '100%', width: '100%', position: 'relative', zIndex: 0 }}
+    >
+      <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
+      />
 
-            {rescues.map(rescue => (
-                <Marker
-                    key={rescue.id}
-                    position={rescue.position}
-                    icon={getIconBySeverity(rescue.severity)}
-                >
-                    <Popup>
-                        <b>{rescue.name}</b><br />
-                        Severity: {rescue.severity}
-                    </Popup>
-                </Marker>
-            ))}
-        </MapContainer>
-    );
+      {rescues.map(({ id, position, name, severity }) => (
+        <Marker key={id} position={position} icon={getIconBySeverity(severity)}>
+          <Popup>
+            <b>{name}</b>
+            <br />
+            Severity: {severity}
+            <br />
+            Type: Vehicle Accident
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
+  );
 };
 
 export default RescueMap;
